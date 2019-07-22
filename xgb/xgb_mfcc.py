@@ -7,10 +7,10 @@ import joblib
 import os
 import numpy as np
 
-clf = XGBClassifier(max_depth=7,
+clf = XGBClassifier(max_depth=5,
                            min_child_weight=1,
                            learning_rate=0.1,
-                           n_estimators=500,
+                           n_estimators=1000,
                            silent=True,
                            objective='binary:logistic',
                            gamma=0,

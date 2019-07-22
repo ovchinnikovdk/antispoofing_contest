@@ -7,8 +7,7 @@ import pandas as pd
 import librosa
 from xgboost import XGBClassifier
 import sys
-sys.path.insert(0, './mfcc_approach')
-from mfcc import get_features
+from prepare_data import get_features
 
 if __name__ == '__main__':
     model = joblib.load('xgb.dat')
