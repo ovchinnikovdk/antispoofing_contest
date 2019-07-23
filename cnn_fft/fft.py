@@ -27,9 +27,6 @@ def preprocess_batch(files, labels, num=0, n_jobs=4):
     data = Parallel(n_jobs=n_jobs)(delayed(fft_load)(filename) for filename in files)#tqdm.tqdm(files))
     save_dir = os.path.join(os.pardir, 'data')
     save_dir = os.path.join(save_dir, 'fft')
-    print(data[0].shape)
-    print(data[0])
-    print(data[0].dtype)
     np.save(os.path.join(save_dir, 'stft_data_batch_' + str(num)), np.array(data))
     np.save(os.path.join(save_dir, 'stft_labels_batch_' + str(num)), np.array(labels))
 
@@ -69,4 +66,4 @@ def filename_loader(path, size=None, balanced=True):
 if __name__ == '__main__':
     path = os.path.join(os.pardir, 'data')
     path = os.path.join(path, 'train')
-    preprare_data(path,split_size=1)
+    preprare_data(path,split_size=16)

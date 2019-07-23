@@ -34,7 +34,7 @@ def train(net, path, batch_size=128, n_epochs=30, lr=1e-3):
     val_data = Variable(torch.Tensor(val_data)).cuda()
     print('Val_shape: ',val_data.shape)
     val_y = np.load(os.path.join(path, train_paths[0].replace('data_', 'labels_')))[:1000]
-    train_paths = [os.path.join(path, tr) for tr in train_paths[1:3]]
+    train_paths = [os.path.join(path, tr) for tr in train_paths[1:]]
     for i in tqdm(range(n_epochs), desc='Training epochs'):
         net.train()
         sum_loss = 0
@@ -65,7 +65,7 @@ def train(net, path, batch_size=128, n_epochs=30, lr=1e-3):
     torch.save(net.state_dict(), 'cnn_fft_model.dat')
 
 if __name__ == '__main__':
-    model = SpoofDetector(input_shape=(513, 259)).cuda()
+    model = SpoofDetector(input_shape=(257, 518)).cuda()
     path = os.path.join(os.pardir, 'data')
     path = os.path.join(path, 'fft')
-    train(model, batch_size=100, n_epochs=20, path=path)
+    train(model, batch_size=80, n_epochs=20, path=path)
