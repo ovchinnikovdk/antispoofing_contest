@@ -59,4 +59,4 @@ def filename_loader(path, size=None, balanced=True):
     return [files[idx[i]] for i in range(len(idx[:size]))], [labels[idx[i]] for i in range(len(idx[:size]))]
 
 if __name__ == '__main__':
-    prepare_features(os.path.join(os.pardir, os.path.join('data', 'train')), size=10000)
+    prepare_features(os.path.join(os.pardir, os.path.join('data', 'train')), size=30000)

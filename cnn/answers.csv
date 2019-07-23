@@ -47,7 +47,7 @@ path,score
 ..\data\train\human\human_05139.wav,1.0
 ..\data\train\spoof\spoof_26920.wav,0.0
 ..\data\train\spoof\spoof_16005.wav,0.0
-..\data\train\spoof\spoof_08664.wav,0.0
+..\data\train\spoof\spoof_08664.wav,1.0
 ..\data\train\spoof\spoof_05307.wav,0.0
 ..\data\train\spoof\spoof_20315.wav,0.0
 ..\data\train\spoof\spoof_08386.wav,0.0
@@ -101,7 +101,7 @@ path,score
 ..\data\train\human\human_01913.wav,1.0
 ..\data\train\human\human_00432.wav,1.0
 ..\data\train\spoof\spoof_27122.wav,0.0
-..\data\train\human\human_02400.wav,1.0
+..\data\train\human\human_02400.wav,0.0
 ..\data\train\spoof\spoof_35962.wav,0.0
 ..\data\train\spoof\spoof_19366.wav,0.0
 ..\data\train\spoof\spoof_11124.wav,0.0
@@ -117,7 +117,7 @@ path,score
 ..\data\train\spoof\spoof_06657.wav,0.0
 ..\data\train\human\human_09118.wav,1.0
 ..\data\train\spoof\spoof_27125.wav,0.0
-..\data\train\spoof\spoof_37183.wav,0.0
+..\data\train\spoof\spoof_37183.wav,1.0
 ..\data\train\spoof\spoof_08066.wav,0.0
 ..\data\train\spoof\spoof_27525.wav,0.0
 ..\data\train\spoof\spoof_17496.wav,0.0
@@ -149,7 +149,7 @@ path,score
 ..\data\train\spoof\spoof_36518.wav,0.0
 ..\data\train\spoof\spoof_00937.wav,0.0
 ..\data\train\spoof\spoof_19587.wav,0.0
-..\data\train\spoof\spoof_07852.wav,1.0
+..\data\train\spoof\spoof_07852.wav,0.0
 ..\data\train\spoof\spoof_07563.wav,0.0
 ..\data\train\spoof\spoof_06659.wav,0.0
 ..\data\train\human\human_03345.wav,1.0
@@ -235,17 +235,17 @@ path,score
 ..\data\train\human\human_08264.wav,1.0
 ..\data\train\spoof\spoof_31930.wav,0.0
 ..\data\train\spoof\spoof_05023.wav,0.0
-..\data\train\human\human_10078.wav,1.0
+..\data\train\human\human_10078.wav,0.0
 ..\data\train\spoof\spoof_26682.wav,0.0
 ..\data\train\spoof\spoof_20145.wav,0.0
 ..\data\train\spoof\spoof_25828.wav,0.0
-..\data\train\spoof\spoof_08233.wav,1.0
+..\data\train\spoof\spoof_08233.wav,0.0
 ..\data\train\spoof\spoof_01992.wav,0.0
 ..\data\train\spoof\spoof_08249.wav,0.0
 ..\data\train\spoof\spoof_16151.wav,0.0
 ..\data\train\spoof\spoof_15880.wav,0.0
 ..\data\train\human\human_04283.wav,1.0
-..\data\train\human\human_06040.wav,1.0
+..\data\train\human\human_06040.wav,0.0
 ..\data\train\human\human_01214.wav,1.0
 ..\data\train\spoof\spoof_24730.wav,0.0
 ..\data\train\spoof\spoof_18247.wav,0.0
@@ -261,7 +261,7 @@ path,score
 ..\data\train\human\human_04722.wav,1.0
 ..\data\train\spoof\spoof_04991.wav,0.0
 ..\data\train\spoof\spoof_35537.wav,0.0
-..\data\train\human\human_02780.wav,1.0
+..\data\train\human\human_02780.wav,0.0
 ..\data\train\spoof\spoof_28012.wav,0.0
 ..\data\train\human\human_00616.wav,1.0
 ..\data\train\spoof\spoof_36058.wav,0.0
@@ -366,7 +366,7 @@ path,score
 ..\data\train\spoof\spoof_12000.wav,0.0
 ..\data\train\spoof\spoof_04881.wav,0.0
 ..\data\train\spoof\spoof_18091.wav,0.0
-..\data\train\human\human_07129.wav,0.0
+..\data\train\human\human_07129.wav,1.0
 ..\data\train\spoof\spoof_29026.wav,0.0
 ..\data\train\spoof\spoof_35996.wav,0.0
 ..\data\train\spoof\spoof_27644.wav,0.0
@@ -716,7 +716,7 @@ path,score
 ..\data\train\human\human_07739.wav,1.0
 ..\data\train\spoof\spoof_12304.wav,0.0
 ..\data\train\spoof\spoof_12884.wav,0.0
-..\data\train\spoof\spoof_05951.wav,0.0
+..\data\train\spoof\spoof_05951.wav,1.0
 ..\data\train\spoof\spoof_36931.wav,0.0
 ..\data\train\human\human_02845.wav,1.0
 ..\data\train\spoof\spoof_06863.wav,0.0
@@ -763,7 +763,7 @@ path,score
 ..\data\train\spoof\spoof_02244.wav,0.0
 ..\data\train\spoof\spoof_25544.wav,0.0
 ..\data\train\spoof\spoof_13829.wav,0.0
-..\data\train\human\human_05042.wav,1.0
+..\data\train\human\human_05042.wav,0.0
 ..\data\train\spoof\spoof_07323.wav,0.0
 ..\data\train\spoof\spoof_30467.wav,0.0
 ..\data\train\human\human_05303.wav,1.0
@@ -814,7 +814,7 @@ path,score
 ..\data\train\human\human_00187.wav,1.0
 ..\data\train\spoof\spoof_33775.wav,0.0
 ..\data\train\spoof\spoof_31527.wav,0.0
-..\data\train\spoof\spoof_09220.wav,1.0
+..\data\train\spoof\spoof_09220.wav,0.0
 ..\data\train\spoof\spoof_32123.wav,0.0
 ..\data\train\human\human_04003.wav,1.0
 ..\data\train\spoof\spoof_16307.wav,0.0
@@ -856,9 +856,9 @@ path,score
 ..\data\train\human\human_07525.wav,1.0
 ..\data\train\spoof\spoof_22769.wav,0.0
 ..\data\train\spoof\spoof_32654.wav,0.0
-..\data\train\spoof\spoof_06496.wav,0.0
+..\data\train\spoof\spoof_06496.wav,1.0
 ..\data\train\spoof\spoof_18382.wav,0.0
-..\data\train\human\human_09806.wav,1.0
+..\data\train\human\human_09806.wav,0.0
 ..\data\train\human\human_04542.wav,1.0
 ..\data\train\spoof\spoof_04473.wav,0.0
 ..\data\train\spoof\spoof_39476.wav,0.0
@@ -900,7 +900,7 @@ path,score
 ..\data\train\human\human_02294.wav,1.0
 ..\data\train\human\human_01150.wav,1.0
 ..\data\train\spoof\spoof_34446.wav,0.0
-..\data\train\spoof\spoof_23589.wav,1.0
+..\data\train\spoof\spoof_23589.wav,0.0
 ..\data\train\spoof\spoof_13192.wav,0.0
 ..\data\train\spoof\spoof_08798.wav,0.0
 ..\data\train\spoof\spoof_18209.wav,0.0
@@ -950,7 +950,7 @@ path,score
 ..\data\train\spoof\spoof_00603.wav,0.0
 ..\data\train\spoof\spoof_13222.wav,0.0
 ..\data\train\human\human_09117.wav,1.0
-..\data\train\human\human_04658.wav,1.0
+..\data\train\human\human_04658.wav,0.0
 ..\data\train\human\human_08526.wav,1.0
 ..\data\train\spoof\spoof_20143.wav,0.0
 ..\data\train\human\human_05247.wav,1.0
@@ -995,7 +995,7 @@ path,score
 ..\data\train\spoof\spoof_24886.wav,0.0
 ..\data\train\spoof\spoof_02171.wav,0.0
 ..\data\train\spoof\spoof_18220.wav,0.0
-..\data\train\human\human_04830.wav,1.0
+..\data\train\human\human_04830.wav,0.0
 ..\data\train\human\human_08891.wav,1.0
 ..\data\train\human\human_08592.wav,1.0
 ..\data\train\human\human_06085.wav,1.0

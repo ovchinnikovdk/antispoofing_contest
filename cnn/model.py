@@ -25,3 +25,10 @@ class SpoofDetector(torch.nn.Module):
                                      torch.nn.Dropout(0.6),
                                      torch.nn.Linear(20, 1),
                                      torch.nn.Sigmoid())
+
+
+    def forward(self, input):
+        out = self.conv(input)
+        out = out.view(-1, 30 * self.linsize)
+        out = self.fc(out)
+        return out
