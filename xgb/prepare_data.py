@@ -3,18 +3,22 @@ import librosa
 import os
 import tqdm
 from multiprocessing import Pool
+from joblib import Parallel, delayed
 from scipy.stats import skew
 import scipy
 SAMPLE_RATE = 22050
 
 def prepare_features(path, size=None, n_jobs=4):
-    files, labels = filename_loader(path, balanced=False)
+    files, labels = filename_loader(path, balanced=True)
     if size is None:
         size = len(files)
-    pool = Pool(n_jobs)
-    data = pool.map(get_features, files[:size])
-    np.save('mfcc_features', data)
-    np.save('labels', np.array(labels[:size]))
+    #pool = Pool(n_jobs)
+    
+    data = Parallel(n_jobs=n_jobs)(delayed(get_features)(filename) for filename in tqdm.tqdm(files[:size]))#pool.map(get_features, files[:size])
+    save_dir = os.path.join(os.pardir, 'data')
+    save_dir = os.path.join(save_dir, 'features')
+    np.save(os.path.join(save_dir, 'mfcc_features'), data)
+    np.save(os.path.join(save_dir, 'labels'), np.array(labels[:size]))
 
 def get_features(path):
     b, _ = librosa.core.load(path, sr = SAMPLE_RATE)
@@ -59,4 +63,4 @@ def filename_loader(path, size=None, balanced=True):
     return [files[idx[i]] for i in range(len(idx[:size]))], [labels[idx[i]] for i in range(len(idx[:size]))]
 
 if __name__ == '__main__':
-    prepare_features(os.path.join(os.pardir, os.path.join('data', 'train')), size=30000)
+    prepare_features(os.path.join(os.pardir, os.path.join('data', 'train')))

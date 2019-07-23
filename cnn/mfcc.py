@@ -3,6 +3,7 @@ import librosa
 import os
 import tqdm
 from multiprocessing import Pool
+import multiprocessing as mp
 
 
 def mfcc_load(filename, fr = 22050, sec = 3.0):
@@ -16,17 +17,18 @@ def mfcc_load(filename, fr = 22050, sec = 3.0):
     aud = aud / np.max(np.abs(aud))
     return librosa.feature.mfcc(aud, sr=fr, n_mfcc=50)
 
-def preprocess_batch(files, labels, num, n_jobs=4):
+def preprocess_batch(files, labels, num, n_jobs=mp.cpu_count()):
     assert len(files) == len(labels), 'files and labels should be same count.'
 
     pool = Pool(n_jobs)
     data = pool.map(mfcc_load, files)
-    save_dir = os.path.join('data', 'mfcc_batches')
+    save_dir = os.path.join(os.pardir, 'data')
+    save_dir = os.path.join(save_dir, 'mfcc_data')
     np.save(os.path.join(save_dir, 'data_batch_' + str(num)), np.array(data))
     np.save(os.path.join(save_dir, 'labels_batch_' + str(num)), np.array(labels))
 
-def preprare_data(path, split_size=16):
-    files, labels = filename_loader(path, balanced=False)
+def preprare_data(path, split_size=16, balanced=True):
+    files, labels = filename_loader(path, balanced=balanced)
     batch_size = int(len(files) / split_size)
     for i in tqdm.tqdm(range(split_size)):
         preprocess_batch(files[batch_size*i:(i+1)*batch_size], labels[batch_size*i:(i+1)*batch_size], i)
@@ -59,4 +61,6 @@ def filename_loader(path, size=None, balanced=True):
     return [files[idx[i]] for i in range(len(idx[:size]))], [labels[idx[i]] for i in range(len(idx[:size]))]
 
 if __name__ == '__main__':
-    preprare_data(os.path.join('data', 'train'))
+    path = os.path.join(os.pardir, 'data')
+    path = os.path.join(path, 'train')
+    preprare_data(path)
