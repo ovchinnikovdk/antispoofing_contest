@@ -7,7 +7,7 @@ import joblib
 import os
 import numpy as np
 # from sklearn.linear_model import RidgeClassifier
-from sklearn.svm import SVC
+# from sklearn.svm import SVC
 
 clf = XGBClassifier(max_depth=5,
                            min_child_weight=4,
@@ -29,8 +29,10 @@ clf = XGBClassifier(max_depth=5,
 
 
 
-data = np.load('mfcc_features.npy')
-y = np.load('labels.npy')
+path = os.path.join(os.pardir, 'data')
+path = os.path.join(path, 'features')
+data = np.load(os.path.join(path , 'mfcc_features.npy'))
+y = np.load(os.path.join(path, 'labels.npy'))
 
 clf.fit(data, y)
 joblib.dump(clf, 'xgb.dat')
@@ -39,6 +41,6 @@ joblib.dump(clf, 'xgb.dat')
 # ridge.fit(data, y)
 # joblib.dump(ridge, 'ridge.dat')
 
-svc = SVC(kernel='rbf')
-svc.fit(data, y)
-joblib.dump(svc, 'svc.dat')
+# svc = SVC(kernel='rbf')
+# svc.fit(data, y)
+# joblib.dump(svc, 'svc.dat')
