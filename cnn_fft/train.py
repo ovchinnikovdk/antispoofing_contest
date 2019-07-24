@@ -7,7 +7,7 @@ import sys
 import os
 from tqdm import tqdm
 import time
-from model import SpoofDetector
+from model import FFTSpectogram
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve
 
@@ -65,7 +65,7 @@ def train(net, path, batch_size=128, n_epochs=30, lr=1e-3):
     torch.save(net.state_dict(), 'cnn_fft_model.dat')
 
 if __name__ == '__main__':
-    model = SpoofDetector(input_shape=(257, 518)).cuda()
+    model = FFTSpectogram(input_shape=(257, 130)).cuda()
     path = os.path.join(os.pardir, 'data')
     path = os.path.join(path, 'fft')
-    train(model, batch_size=80, n_epochs=20, path=path)
+    train(model, batch_size=60, n_epochs=30, path=path)

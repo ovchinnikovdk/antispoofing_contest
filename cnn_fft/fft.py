@@ -7,7 +7,7 @@ from joblib import Parallel, delayed
 
 
 def fft_load(filename, fr = 22050, _n_fft=512, sec=3.0):
-    _hop_length = int(_n_fft / 2)
+    _hop_length = int(_n_fft)
     aud, _ = librosa.load(filename, sr=fr, mono=True)
     if len(aud) < sec * fr:
         diff = int(sec * fr - len(aud))
@@ -16,10 +16,11 @@ def fft_load(filename, fr = 22050, _n_fft=512, sec=3.0):
     else:
         aud = aud[:int(sec * fr)]
     aud = aud / np.max(np.abs(aud))
-    stftMat = librosa.stft(aud, n_fft=_n_fft, hop_length=_hop_length, center=True)
+    stft = librosa.stft(aud, n_fft=_n_fft, hop_length=_hop_length, center=True)
+    stft = librosa.amplitude_to_db(np.abs(stft), ref=np.max)
     # iStftMat = librosa.istft(stftMat, hop_length=_hop_length)
     # print(stftMat.shape, iStftMat.shape)
-    return np.hstack((stftMat.real, stftMat.imag)).astype('float64')
+    return stft.astype('float64')#np.hstack((stftMat.real, stftMat.imag)).astype('float64')
 
 def preprocess_batch(files, labels, num=0, n_jobs=4):
     assert len(files) == len(labels), 'files and labels should be same count.'
@@ -66,4 +67,4 @@ def filename_loader(path, size=None, balanced=True):
 if __name__ == '__main__':
     path = os.path.join(os.pardir, 'data')
     path = os.path.join(path, 'train')
-    preprare_data(path,split_size=16)
+    preprare_data(path,split_size=10, size=10000)

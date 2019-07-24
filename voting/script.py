@@ -10,7 +10,7 @@ import pandas as pd
 import librosa
 from xgboost import XGBClassifier
 import sys
-from model import SpoofDetector
+from models import SpoofDetector, FFTSpectogram
 import torch
 from torch.autograd import Variable
 import multiprocessing as mp
@@ -18,7 +18,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve
-from sklearn.svm import SVC
 from scipy.stats import skew
 
 
@@ -27,7 +26,7 @@ def eer_rate(y, y_pred):
     fnr = 1 - tpr
     return fnr[np.nanargmin(np.absolute((fnr - fpr)))]
 
-def preprocess(path, SAMPLE_RATE=22050, sec = 3.0):
+def preprocess(path, SAMPLE_RATE=22050, sec = 3.0, _n_fft=512):
     b, _ = librosa.core.load(path, sr=SAMPLE_RATE)
     assert _ == SAMPLE_RATE
     ft1 = librosa.feature.mfcc(b, sr=SAMPLE_RATE, n_mfcc=20)
@@ -50,12 +49,18 @@ def preprocess(path, SAMPLE_RATE=22050, sec = 3.0):
     else:
         b = b[:int(sec * SAMPLE_RATE)]
     b = b / np.max(np.abs(b))
-    return np.hstack((ft1_trunc, ft2_trunc, ft3_trunc, ft4_trunc, ft5_trunc, ft6_trunc))[None], librosa.feature.mfcc(b, sr=SAMPLE_RATE, n_mfcc=50)
+    stft = librosa.stft(b, n_fft=_n_fft, hop_length=_n_fft, center=True)
+    stft = librosa.amplitude_to_db(np.abs(stft), ref=np.max).astype('float64')
+    mfcc = librosa.feature.mfcc(b, sr=SAMPLE_RATE, n_mfcc=50)
+    return np.hstack((ft1_trunc, ft2_trunc, ft3_trunc, ft4_trunc, ft5_trunc, ft6_trunc))[None], mfcc, stft
 
 
 if __name__ == '__main__':
     xgb = joblib.load('xgb.dat')
-    svc = joblib.load('svc.dat')
+    fft = FFTSpectogram(input_shape=(257, 130))
+    fft.load_state_dict(torch.load('cnn_fft_model.dat'))
+    fft.cuda()
+    fft.eval()
     cnn = SpoofDetector(input_shape=(50, 130))
     cnn.load_state_dict(torch.load('mfcc_model.dat'))
     cnn.cuda()
@@ -67,7 +72,7 @@ if __name__ == '__main__':
     eval_protocol.columns = ['path', 'key']
     eval_protocol['score'] = 0.0
     eval_protocol['xgb'] = 0.0
-    eval_protocol['svc'] = 0.0
+    eval_protocol['fft'] = 0.0
     eval_protocol['cnn'] = 0.0
 
     print(eval_protocol.shape)
@@ -84,9 +89,12 @@ if __name__ == '__main__':
         #xgboost
         score_xgb = xgb.predict(protocol_row['preprocess'][0])[0]
         eval_protocol.at[protocol_id, 'xgb'] = score_xgb
-        #SVM
-        score_svc = svc.predict(protocol_row['preprocess'][0])[0]
-        eval_protocol.at[protocol_id, 'svc'] = score_svc
+        #FFT
+        x = protocol_row['preprocess'][2][None][None]
+        x = Variable(torch.Tensor(x)).cuda()
+        score_fft = fft(x).cpu().data.numpy()[0][0]
+        score_fft = 0 if score_fft < 0.5 else 1
+        eval_protocol.at[protocol_id, 'fft'] = score_fft
         #CNN
         x = protocol_row['preprocess'][1][None][None]
         x = Variable(torch.Tensor(x)).cuda()
@@ -94,9 +102,9 @@ if __name__ == '__main__':
         score_cnn = 0 if score_cnn < 0.5 else 1
         eval_protocol.at[protocol_id, 'cnn'] = score_cnn
         #Voting
-        eval_protocol.at[protocol_id, 'score'] = np.median([score_xgb, score_svc, score_cnn])
+        eval_protocol.at[protocol_id, 'score'] = np.median([score_xgb, score_fft, score_cnn])
     # eval_protocol[['path', 'score']].to_csv('answers.csv', index=None)
-    print(eval_protocol[['path', 'xgb', 'svc', 'cnn', 'score']].sample(10).head())
+    print(eval_protocol[['path', 'xgb', 'fft', 'cnn', 'score']].sample(10).head())
     eval_protocol['key'] = eval_protocol['path'].apply(lambda x: 0 if 'spoof' in x else 1)
 
     print('---------------------')
@@ -106,11 +114,11 @@ if __name__ == '__main__':
     print('XGB => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
     print('XGB => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['xgb'])))
     print('---------------------')
-    print('SVC => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['svc'])))
-    print('SVC => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['svc'])))
-    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['svc']).ravel()
-    print('SVC => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
-    print('SVC => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['svc'])))
+    print('FFT => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['fft'])))
+    print('FFT => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['fft'])))
+    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['fft']).ravel()
+    print('FFT => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
+    print('FFT => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['fft'])))
     print('---------------------')
     print('CNN => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['cnn'])))
     print('CNN => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['cnn'])))
@@ -120,7 +128,7 @@ if __name__ == '__main__':
     print('---------------------')
     print('Final voting => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['score'])))
     print('Final voting => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['score'])))
-    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['cnn']).ravel()
+    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['score']).ravel()
     print('Final voting => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
     print('Final voting => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['score'])))
     print('---------------------')

@@ -9,10 +9,10 @@ from xgboost import XGBClassifier
 import sys
 from prepare_data import get_features
 import multiprocessing as mp
+from joblib import delayed, Parallel
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix
-from sklearn.linear_model import RidgeClassifier
 
 def preprocess(protocol_row):
     x = get_features(protocol_row)[None]
@@ -33,10 +33,12 @@ if __name__ == '__main__':
 
     p = mp.Pool(mp.cpu_count())
     eval_protocol['path_dir'] = eval_protocol['path'].apply(lambda x: os.path.join(dataset_dir, x))
-    eval_protocol['preprocess'] = p.map(preprocess, eval_protocol['path_dir'])
+    print('Preprocessing...')
+    eval_protocol['preprocess'] = Parallel(n_jobs=mp.cpu_count())(delayed(preprocess)(row) for row in tqdm.tqdm(eval_protocol['path_dir']))
+    #p.map(preprocess, eval_protocol['path_dir'])
+    print('Predicting...')
     for protocol_id, protocol_row in tqdm.tqdm(list(eval_protocol.iterrows())):
         score = model.predict(protocol_row['preprocess'])[0]
-        score_ridge = ridge.predict(protocol_row['preprocess'])
         eval_protocol.at[protocol_id, 'score'] = score
     eval_protocol[['path', 'score']].to_csv('answers.csv', index=None)
     print(eval_protocol.sample(10).head())
