@@ -14,8 +14,8 @@ def mfcc_load(filename, fr = 22050, sec = 3.0):
         aud = np.pad(aud, (pad, diff - pad), mode='reflect')
     else:
         aud = aud[:int(sec * fr)]
-    aud = aud / np.max(np.abs(aud))
-    return librosa.feature.mfcc(aud, sr=fr, n_mfcc=50)
+    # aud = aud / np.max(np.abs(aud))
+    return np.abs(librosa.feature.mfcc(aud, sr=fr, n_mfcc=50))
 
 def preprocess_batch(files, labels, num, n_jobs=mp.cpu_count()):
     assert len(files) == len(labels), 'files and labels should be same count.'

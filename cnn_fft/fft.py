@@ -18,9 +18,7 @@ def fft_load(filename, fr = 22050, _n_fft=512, sec=3.0):
     aud = aud / np.max(np.abs(aud))
     stft = librosa.stft(aud, n_fft=_n_fft, hop_length=_hop_length, center=True)
     stft = librosa.amplitude_to_db(np.abs(stft), ref=np.max)
-    # iStftMat = librosa.istft(stftMat, hop_length=_hop_length)
-    # print(stftMat.shape, iStftMat.shape)
-    return stft.astype('float64')#np.hstack((stftMat.real, stftMat.imag)).astype('float64')
+    return stft.astype('float64')
 
 def preprocess_batch(files, labels, num=0, n_jobs=4):
     assert len(files) == len(labels), 'files and labels should be same count.'
