@@ -6,10 +6,10 @@ import torch
 import numpy as np
 import pandas as pd
 import librosa
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import roc_curve
+# from sklearn.metrics import accuracy_score
+# from sklearn.metrics import roc_auc_score
+# from sklearn.metrics import confusion_matrix
+# from sklearn.metrics import roc_curve
 from model import FFTSpectogram
 
 def eer_rate(y, y_pred):
@@ -54,8 +54,8 @@ if __name__ == '__main__':
     eval_protocol[['path', 'score']].to_csv('answers.csv', index=None)
     print(eval_protocol.sample(10).head())
     eval_protocol['key'] = eval_protocol['path'].apply(lambda x: 0 if 'spoof' in x else 1)
-    print('Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['score'])))
-    print('ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['score'])))
-    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['score']).ravel()
-    print('ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
-    print('EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['score'])))
+    # print('Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['score'])))
+    # print('ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['score'])))
+    # tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['score']).ravel()
+    # print('ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
+    # print('EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['score'])))

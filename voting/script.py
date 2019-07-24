@@ -14,17 +14,8 @@ from models import SpoofDetector, FFTSpectogram
 import torch
 from torch.autograd import Variable
 import multiprocessing as mp
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import roc_curve
 from scipy.stats import skew
 
-
-def eer_rate(y, y_pred):
-    fpr, tpr, threshold = roc_curve(y, y_pred, pos_label=1)
-    fnr = 1 - tpr
-    return fnr[np.nanargmin(np.absolute((fnr - fpr)))]
 
 def preprocess(path, SAMPLE_RATE=22050, sec = 3.0, _n_fft=512):
     b, _ = librosa.core.load(path, sr=SAMPLE_RATE)
@@ -49,8 +40,10 @@ def preprocess(path, SAMPLE_RATE=22050, sec = 3.0, _n_fft=512):
     else:
         b = b[:int(sec * SAMPLE_RATE)]
     b = b / np.max(np.abs(b))
+    #STFT
     stft = librosa.stft(b, n_fft=_n_fft, hop_length=_n_fft, center=True)
     stft = librosa.amplitude_to_db(np.abs(stft), ref=np.max).astype('float64')
+    #MFCC
     mfcc = librosa.feature.mfcc(b, sr=SAMPLE_RATE, n_mfcc=50)
     return np.hstack((ft1_trunc, ft2_trunc, ft3_trunc, ft4_trunc, ft5_trunc, ft6_trunc))[None], mfcc, stft
 
@@ -79,10 +72,8 @@ if __name__ == '__main__':
     print(eval_protocol.sample(10).head())
     print(eval_protocol.shape)
 
-    p = mp.Pool(mp.cpu_count())
     eval_protocol['path_dir'] = eval_protocol['path'].apply(lambda x: os.path.join(dataset_dir, x))
     print('Preprocessing...')
-    # eval_protocol['preprocess'] = p.map(preprocess, eval_protocol['path_dir'])
     eval_protocol['preprocess'] = joblib.Parallel(n_jobs=mp.cpu_count())(joblib.delayed(preprocess)(row) for row in tqdm.tqdm(eval_protocol['path_dir']))
     print('Predicting...')
     for protocol_id, protocol_row in tqdm.tqdm(list(eval_protocol.iterrows())):
@@ -103,33 +94,5 @@ if __name__ == '__main__':
         eval_protocol.at[protocol_id, 'cnn'] = score_cnn
         #Voting
         eval_protocol.at[protocol_id, 'score'] = np.median([score_xgb, score_fft, score_cnn])
-    # eval_protocol[['path', 'score']].to_csv('answers.csv', index=None)
     print(eval_protocol[['path', 'xgb', 'fft', 'cnn', 'score']].sample(10).head())
-    eval_protocol['key'] = eval_protocol['path'].apply(lambda x: 0 if 'spoof' in x else 1)
-
-    print('---------------------')
-    print('XGB => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['xgb'])))
-    print('XGB => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['xgb'])))
-    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['xgb']).ravel()
-    print('XGB => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
-    print('XGB => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['xgb'])))
-    print('---------------------')
-    print('FFT => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['fft'])))
-    print('FFT => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['fft'])))
-    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['fft']).ravel()
-    print('FFT => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
-    print('FFT => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['fft'])))
-    print('---------------------')
-    print('CNN => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['cnn'])))
-    print('CNN => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['cnn'])))
-    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['cnn']).ravel()
-    print('CNN => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
-    print('CNN => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['cnn'])))
-    print('---------------------')
-    print('Final voting => Accuracy score: ' + str(accuracy_score(eval_protocol['key'], eval_protocol['score'])))
-    print('Final voting => ROC-AUC score: ' + str(roc_auc_score(eval_protocol['key'], eval_protocol['score'])))
-    tn, fp, fn, tp = confusion_matrix(eval_protocol['key'], eval_protocol['score']).ravel()
-    print('Final voting => ERR rate: ' + str((fp + fn) / (tp + tn + fn + fp)))
-    print('Final voting => EER: ' + str(eer_rate(eval_protocol['key'], eval_protocol['score'])))
-    print('---------------------')
     eval_protocol[['path', 'score']].to_csv('answers.csv', index=None)
