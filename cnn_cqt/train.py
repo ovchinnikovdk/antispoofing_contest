@@ -7,7 +7,7 @@ import sys
 import os
 from tqdm import tqdm
 import time
-from model import FFTSpectogram
+from model import CQTChromogram
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve
 
@@ -62,10 +62,10 @@ def train(net, path, batch_size=128, n_epochs=30, lr=1e-3):
                 pred_y.append(pred)
             print('Accuracy score: ' + str(accuracy_score(val_y, pred_y)))
             print('EER: ' + str(eer_rate(val_y, pred_y)))
-    torch.save(net.state_dict(), 'cnn_fft_model.dat')
+    torch.save(net.state_dict(), 'cnn_cqt_model.dat')
 
 if __name__ == '__main__':
-    model = FFTSpectogram(input_shape=(257, 130)).cuda()
+    model = CQTChromogram(input_shape=(24, 130)).cuda()
     path = os.path.join(os.pardir, 'data')
-    path = os.path.join(path, 'fft')
-    train(model, batch_size=60, n_epochs=30, path=path)
+    path = os.path.join(path, 'cqt')
+    train(model, batch_size=160, n_epochs=50, path=path)

@@ -4,36 +4,32 @@ import os
 import tqdm
 from multiprocessing import Pool
 from joblib import Parallel, delayed
+from scipy.stats import skew
+import scipy
+SAMPLE_RATE = 22050
 
+def prepare_features(path, size=None, n_jobs=4):
+    files, labels = filename_loader(path, balanced=True)
+    if size is None:
+        size = len(files)
 
-def cqt_load(filename, fr = 22050,sec=3.0,):# n_chroma=30, n_fft=1024):
-    aud, _ = librosa.load(filename, sr=fr, mono=True)
+    data = Parallel(n_jobs=n_jobs)(delayed(get_features)(filename) for filename in tqdm.tqdm(files[:size]))
+    save_dir = os.path.join(os.pardir, 'data')
+    save_dir = os.path.join(save_dir, 'features_cqt')
+    np.save(os.path.join(save_dir, 'features'), np.array(data))
+    np.save(os.path.join(save_dir, 'labels'), np.array(labels[:size]))
+
+def get_features(path, sec=5.0, fr=SAMPLE_RATE):
+    aud, _ = librosa.core.load(path, sr = SAMPLE_RATE)
+    assert _ == SAMPLE_RATE
     if len(aud) < sec * fr:
         diff = int(sec * fr - len(aud))
         pad = np.random.randint(diff)
-        aud = np.pad(aud, (pad, diff - pad), mode='reflect')
+        aud = np.pad(aud, (pad, diff - pad), mode='constant')
     else:
         aud = aud[:int(sec * fr)]
-    aud = aud / np.max(np.abs(aud))
-    cqt = librosa.feature.chroma_cqt(y=aud, sr=fr)
-    return cqt.astype('float64')
-
-def preprocess_batch(files, labels, num=0, n_jobs=4):
-    assert len(files) == len(labels), 'files and labels should be same count.'
-
-    data = Parallel(n_jobs=n_jobs)(delayed(cqt_load)(filename) for filename in files)#tqdm.tqdm(files))
-    save_dir = os.path.join(os.pardir, 'data')
-    save_dir = os.path.join(save_dir, 'cqt')
-    np.save(os.path.join(save_dir, 'data_batch_' + str(num)), np.array(data))
-    np.save(os.path.join(save_dir, 'labels_batch_' + str(num)), np.array(labels))
-
-def preprare_data(path, split_size=16, balanced=True, size=None):
-    files, labels = filename_loader(path, balanced=balanced, size=size)
-    batch_size = int(len(files) / split_size)
-    for i in tqdm.tqdm(range(split_size)):
-        preprocess_batch(files[batch_size*i:(i+1)*batch_size], labels[batch_size*i:(i+1)*batch_size], i)
-
-
+    cqt = librosa.feature.chroma_cqt(y=aud, sr=SAMPLE_RATE)
+    return cqt
 
 def filename_loader(path, size=None, balanced=True):
     spoof_dir = os.path.join(path, 'spoof')
@@ -61,6 +57,4 @@ def filename_loader(path, size=None, balanced=True):
     return [files[idx[i]] for i in range(len(idx[:size]))], [labels[idx[i]] for i in range(len(idx[:size]))]
 
 if __name__ == '__main__':
-    path = os.path.join(os.pardir, 'data')
-    path = os.path.join(path, 'train')
-    preprare_data(path,split_size=10, size=100)
+    prepare_features(os.path.join(os.pardir, os.path.join('data', 'train')))
