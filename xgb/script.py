@@ -7,7 +7,7 @@ import pandas as pd
 import librosa
 from xgboost import XGBClassifier
 import sys
-from prepare_data import get_features
+from preprocess import get_features
 import multiprocessing as mp
 from joblib import delayed, Parallel
 from sklearn.metrics import accuracy_score
@@ -35,7 +35,6 @@ if __name__ == '__main__':
     eval_protocol['path_dir'] = eval_protocol['path'].apply(lambda x: os.path.join(dataset_dir, x))
     print('Preprocessing...')
     eval_protocol['preprocess'] = Parallel(n_jobs=mp.cpu_count())(delayed(preprocess)(row) for row in tqdm.tqdm(eval_protocol['path_dir']))
-    #p.map(preprocess, eval_protocol['path_dir'])
     print('Predicting...')
     for protocol_id, protocol_row in tqdm.tqdm(list(eval_protocol.iterrows())):
         score = model.predict(protocol_row['preprocess'])[0]

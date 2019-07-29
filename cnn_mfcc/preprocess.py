@@ -4,6 +4,7 @@ import os
 import tqdm
 from multiprocessing import Pool
 import multiprocessing as mp
+np.random.seed(342461)
 
 
 def mfcc_load(filename, fr = 22050, sec = 3.0):
@@ -27,7 +28,7 @@ def preprocess_batch(files, labels, num, n_jobs=mp.cpu_count()):
     np.save(os.path.join(save_dir, 'data_batch_' + str(num)), np.array(data))
     np.save(os.path.join(save_dir, 'labels_batch_' + str(num)), np.array(labels))
 
-def preprare_data(path, split_size=16, balanced=True):
+def preprare_data(path, split_size=18, balanced=True):
     files, labels = filename_loader(path, balanced=balanced)
     batch_size = int(len(files) / split_size)
     for i in tqdm.tqdm(range(split_size)):
@@ -47,7 +48,7 @@ def filename_loader(path, size=None, balanced=True):
         human_idx = np.array(range(len(hu_lst)))
         np.random.shuffle(spoof_idx)
         np.random.shuffle(human_idx)
-        spoof_files = [os.path.join(spoof_dir, sp_lst[idx]) for idx in spoof_idx[:max_len]]
+        spoof_files = [os.path.join(spoof_dir, sp_lst[idx]) for idx in spoof_idx[:2*max_len]]
         human_files = [os.path.join(human_dir, hu_lst[idx]) for idx in human_idx[:max_len]]
     else:
         spoof_files = [os.path.join(spoof_dir, filename) for filename in sp_lst]

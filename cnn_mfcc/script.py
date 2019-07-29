@@ -11,7 +11,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve
 from model import SpoofDetector
-from mfcc import mfcc_load
+from preprocess import mfcc_load
 
 def eer_rate(y, y_pred):
     fpr, tpr, threshold = roc_curve(y, y_pred, pos_label=1)

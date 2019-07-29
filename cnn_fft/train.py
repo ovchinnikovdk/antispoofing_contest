@@ -25,7 +25,7 @@ def batch_iterator(path, batch_size=256, shuffle=False):
         yield x, y
 
 
-def train(net, path, batch_size=128, n_epochs=30, lr=1e-3):
+def train(net, path, batch_size=128, n_epochs=30, lr=5e-4):
     optimizer = Adam(net.parameters(), lr=lr)
     loss = torch.nn.BCELoss()
     net.train()
@@ -48,11 +48,11 @@ def train(net, path, batch_size=128, n_epochs=30, lr=1e-3):
                 loss_out.backward()
                 optimizer.step()
                 sum_loss += loss_out.data[0]
-        if i % 5 == 0 and i > 0:
+        if i % 10 == 0 and i > 0:
+            torch.save(net.state_dict(), 'semitrained/cnn_fft_model_e' + str(i) + '.dat')
+        if i % 3 == 0 and i > 0:
             print("EPOCH #" + str(i))
             print("Loss: " + str(sum_loss))
-            if i % 10 == 0:
-                torch.save(net.state_dict(), 'semitrained/cnn_fft_model_e' + str(i) + '.dat')
             torch.cuda.empty_cache()
             net.eval()
             pred_y = []
@@ -68,4 +68,4 @@ if __name__ == '__main__':
     model = FFTSpectogram(input_shape=(257, 130)).cuda()
     path = os.path.join(os.pardir, 'data')
     path = os.path.join(path, 'fft')
-    train(model, batch_size=60, n_epochs=30, path=path)
+    train(model, batch_size=60, n_epochs=13, path=path)
